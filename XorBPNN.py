@@ -46,7 +46,9 @@ vSign = np.vectorize(Sign)
 implementation of XorBPNN
 '''
 class XorBPNN (BaseEstimator, ClassifierMixin):
-    def __init__(self, learning_rate = 0.1, epoch = 100, batchsize = 1, hidden_layer_size = 2):
+    def __init__(self, learning_rate = 0.1, epoch = 100, batchsize = 1, 
+                    hidden_layer_size = 2,
+                    activate = sigmoid, d_activate_to_x = d_sigmoid_to_x):
         """
         Called when initializing the classifier
         """
@@ -69,6 +71,9 @@ class XorBPNN (BaseEstimator, ClassifierMixin):
         self.learning_rate = learning_rate
         self.epoch = epoch
         self.batchsize = batchsize
+        self.activate = activate
+        self.vactivate = np.vectorize(self.activate)
+        self.d_activate_to_x = d_activate_to_x
         # and then initialize the layers
         self.forward(np.ones(2))
         
@@ -144,9 +149,9 @@ class XorBPNN (BaseEstimator, ClassifierMixin):
          and the weights keep fixed
         '''
         self.input[1 : ] = x
-        v_h = vsigmoid(np.matmul(self.W_1, self.input))             # size: 2 * 1
+        v_h = self.vactivate(np.matmul(self.W_1, self.input))             # size: 2 * 1
         self.hidden_layer[1 : ] = v_h                               # extend to size: 3 * 1
-        self.output = sigmoid(np.matmul(self.W_2, self.hidden_layer))   # scalar
+        self.output = self.activate(np.matmul(self.W_2, self.hidden_layer))   # scalar
         return self.output
 
     def backward(self, y):
@@ -156,8 +161,8 @@ class XorBPNN (BaseEstimator, ClassifierMixin):
         where 'y' is the actual value for a sample 
         '''
         # compute the difference while the neurons are fixed
-        common_coef = pd_MSE_to_y_hat(y_hat=self.output, y=y) * d_sigmoid_to_x(y_hat=self.output)
-        mat = [[self.W_2[j + 1] * d_sigmoid_to_x(self.hidden_layer[j + 1]) * self.input[i] for i in range(2 + 1)] for j in range(self.hidden_layer_size)]
+        common_coef = pd_MSE_to_y_hat(y_hat=self.output, y=y) * self.d_activate_to_x(y_hat=self.output)
+        mat = [[self.W_2[j + 1] * self.d_activate_to_x(self.hidden_layer[j + 1]) * self.input[i] for i in range(2 + 1)] for j in range(self.hidden_layer_size)]
         diff_W_2 = common_coef * self.hidden_layer
         diff_W_1 = common_coef * np.array(mat)
         # update the weights

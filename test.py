@@ -22,12 +22,32 @@ a test fot XorBPNN
 '''
 from XorBPNN import XorBPNN
 from visualize import visualize_scatter, visualize_contour
+from numpy import exp
 fig_scale = 2
 
-nn = XorBPNN(epoch = 100, 
+def d_tanh (y_hat):
+    return 1 - y_hat ** 2
+def tanh(x):
+    return (exp(x) - exp(-x))/(exp(x) + exp(-x))
+def ReLu(x):
+    return x if x > 0 else 0
+def d_ReLu(y_hat):
+    return 1 if y_hat > 0 else 0
+def ELU(x, alpha = 1):
+    return alpha * (exp(x) - 1) if x < 0 else x
+def d_ELU(y_hat, alpha = 1):
+    return y_hat + alpha if y_hat < 0 else 1
+def s_tanh(x, s = 1):
+    return s * (exp(x) - exp(-x))/(exp(x) + exp(-x))
+def d_s_tanh(y_hat, s = 1):
+    return s * (1 - y_hat ** 2)
+
+nn = XorBPNN(epoch = 1000, 
                 batchsize=4, 
-                learning_rate=0.1, 
-                hidden_layer_size=2)
+                learning_rate=0.05, 
+                hidden_layer_size=2,
+                activate=s_tanh,
+                d_activate_to_x=d_s_tanh)
 # plot initial nn
 visualize_scatter(regressor=nn.predict, scale = fig_scale)
 
