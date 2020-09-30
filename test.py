@@ -21,15 +21,17 @@
 a test fot XorBPNN
 '''
 from XorBPNN import XorBPNN
-from visualize import visualize
+from visualize import visualize_scatter, visualize_contour
+fig_scale = 2
 
 nn = XorBPNN(epoch = 100, 
                 batchsize=4, 
                 learning_rate=0.1, 
                 hidden_layer_size=2)
 # plot initial nn
-visualize(regressor=nn.predict)
+visualize_scatter(regressor=nn.predict, scale = fig_scale)
 
+# %%
 print("the initial weights of BPNN is \n W_1:\n{0}\n W_2:\n{1}".format(nn.W_1, nn.W_2))
 X = nn.test_X
 y = nn.test_y
@@ -42,8 +44,7 @@ print("the trained weights of BPNN is \n W_1:\n{0}\n W_2:\n{1}".format(nn.W_1, n
 print("score /accuracy of the NN is: {0}".format(nn.score(X, y)))
 print("loss of the nn is:{0}".format(nn.loss(X, y)))
 # plot trained nn
-visualize(regressor=nn.predict)
-
+visualize_scatter(regressor=nn.predict, scale = fig_scale)
 # %%
 '''
 a test for AssertionError
@@ -86,4 +87,13 @@ unzip the
 # X, y = zip(*test_set)
 # print(X)
 # print(y)
+# %%
+'''
+a test for np.meshgrid()
+'''
+# import numpy as np
+# x = np.linspace(-5, 5, 5)
+# y = np.linspace(-5, 5, 5)
+# i, j = np.meshgrid(x, y)
+
 # %%

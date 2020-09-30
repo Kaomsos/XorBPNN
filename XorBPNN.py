@@ -52,8 +52,12 @@ class XorBPNN (BaseEstimator, ClassifierMixin):
         """
         self.hidden_layer_size = hidden_layer_size
         # weights
-        self.W_1 = random.rand(self.hidden_layer_size, 2 + 1)    # size = 2 * 3
-        self.W_2 = random.rand(self.hidden_layer_size + 1)      # size = 1 * 3
+        ## random initialization
+        self.W_1 = random.rand(self.hidden_layer_size, 2 + 1)   # size = 2 * 3
+        self.W_2 = random.rand(self.hidden_layer_size + 1)    # size = 1 * 3
+        ## zero initialization
+        # self.W_1 = np.zeros(shape = (self.hidden_layer_size, 2 + 1))   # size = 2 * 3
+        # self.W_2 = np.zeros(shape = self.hidden_layer_size + 1)    # size = 1 * 3
         # layers
         self.input = np.ones(2 + 1)        # size = 3 * 1
         self.hidden_layer = np.ones(self.hidden_layer_size + 1) # size = 3 * 1
