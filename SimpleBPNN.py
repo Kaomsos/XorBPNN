@@ -5,6 +5,7 @@ as simple as importing
 from sklearn.base import BaseEstimator, ClassifierMixin
 import numpy as np
 import numpy.random as random
+from EXC_EarlyStop import EarlyStop
 
 # %%
 '''
@@ -42,7 +43,7 @@ def Sign(x, threshhold = 0.5):
 implementation of XorBPNN
 '''
 class XorBPNN (BaseEstimator, ClassifierMixin):
-    def __init__(self, learning_rate = 0.1):
+    def __init__(self, learning_rate = 0.1, epoch = 100, batchsize = 4):
         """
         Called when initializing the classifier
         """
@@ -56,10 +57,15 @@ class XorBPNN (BaseEstimator, ClassifierMixin):
         remember not to change the first "design component" (which equals 1) 
         '''
         self.output = 0                     # number/scalar # which equals y_hat
+        # hyper-parameter
         self.learning_rate = learning_rate
+        self.epoch = epoch
+        self.batchsize = batchsize
         # and then initialize the layers
-        self.forward()
-      
+        self.forward(np.ones(2))
+        
+        # built_in dataset
+        self.test
     # def set_params(self, **params):
     #     return super().set_params(**params)
     # def get_params(self, deep=True):
@@ -79,10 +85,15 @@ class XorBPNN (BaseEstimator, ClassifierMixin):
         which are created in fit method. 
         These should be ended by _ at the end, e.g. self.fitted_
         '''
-        while True:
-            self.input[1 : ] = X[i]
-            self.forward()
-            self.backward()
+        for i in range(self.epoch):
+            for j in range(self.batchsize):
+                self.forward(X[j])
+                self.backward(y[j])
+            try:
+                assert self.score(self.test_set) < 1, "Perfect Prediction, Early Stop　Triggered."
+            except AssertionError as e:
+                print(e.args[0])
+                break
         return self
 
     def predict(self, X):
@@ -92,16 +103,19 @@ class XorBPNN (BaseEstimator, ClassifierMixin):
         return [self.forward(x) for x in X]
     
     def score(self, X, y, sample_weight=None):
+        '''
+        return the accuracy
+        '''
         _l = self.predict(X) == y
         return sum(_l) / len(_l)
 
-    def forward(self):
+    def forward(self, x):
         '''
+         take x as input, return the output //
          from input/X to output/y_hat
          and the weights keep fixed
-         -----
-         then return the output
         '''
+        self.input[1 : ] = x
         v_h = vsigmoid(np.matmul(self.W_1, self.input))             # size: 2 * 1
         self.hidden_layer[1 : ] = v_h                               # extend to size: 3 * 1
         self.output = sigmoid(np.matmul(self.W_2, self.hidden_layer))   # scalar
@@ -109,10 +123,11 @@ class XorBPNN (BaseEstimator, ClassifierMixin):
 
     def backward(self, y):
         '''
+        take y as input and update the paramenters, no return //
         from output/y_hat to previous weights
         where 'y' is the actual value for a sample 
         '''
-        # ccompute the difference while the neurons are fixed
+        # compute the difference while the neurons are fixed
         common_coef = pd_MSE_to_y_hat(y_hat=self.output, y=y) * d_sigmoid_to_x(y_hat=self.output)
         mat = [[self.W_1[j] * d_sigmoid_to_x(j) * self.input[i] for i in range(1, 4)] for j in range(1, 3)]
         diff_W_2 = common_coef * self.hidden_layer

@@ -18,3 +18,12 @@ from sklearn.pipeline import Pipeline
 from sklearn.model_selection import GridSearchCV
 
 # %%
+for i in range(10):
+            for j in range(5):
+                print("print({0},{1})".format(i, j))
+            try:
+                assert i < 5, "Perfect Prediction, Early Stop Triggered."
+            except AssertionError as e:
+                print(e.args[0])
+                break
+# %%
