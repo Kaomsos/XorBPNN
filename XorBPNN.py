@@ -32,12 +32,12 @@ def d_sigmoid_to_x(y_hat):
     '''
     return y_hat * (1 - y_hat)
 
-def Sign(x, threshhold = 0.5):
+def Sign(x, threshhold = 0):
     '''
     return 1 if x >= threshhold
     else return 0
     '''
-    return 1 if x >= threshhold else 0
+    return 1 if x >= threshhold else 0 
 
 vSign = np.vectorize(Sign)
 

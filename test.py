@@ -24,7 +24,10 @@ from XorBPNN import XorBPNN
 from visualize import visualize_scatter, visualize_contour
 from numpy import exp
 fig_scale = 2
-
+def sigmoid(x):
+    return 1 / (1 + exp(-x))
+def d_sigmoid(y_hat):
+    return y_hat * (1 - y_hat)
 def d_tanh (y_hat):
     return 1 - y_hat ** 2
 def tanh(x):
@@ -37,19 +40,19 @@ def ELU(x, alpha = 1):
     return alpha * (exp(x) - 1) if x < 0 else x
 def d_ELU(y_hat, alpha = 1):
     return y_hat + alpha if y_hat < 0 else 1
-def s_tanh(x, s = 1):
+def s_tanh(x, s = 0.5):
     return s * (exp(x) - exp(-x))/(exp(x) + exp(-x))
-def d_s_tanh(y_hat, s = 1):
+def d_s_tanh(y_hat, s = 0.5):
     return s * (1 - y_hat ** 2)
 
 nn = XorBPNN(epoch = 1000, 
                 batchsize=4, 
-                learning_rate=0.05, 
+                learning_rate=0.1, 
                 hidden_layer_size=2,
-                activate=s_tanh,
-                d_activate_to_x=d_s_tanh)
+                activate=tanh,
+                d_activate_to_x=d_tanh)
 # plot initial nn
-visualize_scatter(regressor=nn.predict, scale = fig_scale)
+visualize_scatter(regressor=nn.predict, scale = fig_scale, threshhold=0)
 
 # %%
 print("the initial weights of BPNN is \n W_1:\n{0}\n W_2:\n{1}".format(nn.W_1, nn.W_2))
@@ -65,6 +68,7 @@ print("score /accuracy of the NN is: {0}".format(nn.score(X, y)))
 print("loss of the nn is:{0}".format(nn.loss(X, y)))
 # plot trained nn
 visualize_scatter(regressor=nn.predict, scale = fig_scale)
+
 # %%
 '''
 a test for AssertionError

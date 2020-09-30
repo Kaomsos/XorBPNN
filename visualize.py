@@ -4,7 +4,7 @@ from numpy import random
 from IPython.display import display # <- where the display() is included
 
 ## see through its prediction
-def visualize_scatter(regressor, N = 10000, scale = 1):
+def visualize_scatter(regressor, N = 10000, scale = 1, threshhold = 0.5):
     '''
     2-dimensional inputs -> regressor -> array-like output
     scatter with pyplot
@@ -13,7 +13,7 @@ def visualize_scatter(regressor, N = 10000, scale = 1):
     Y = (random.rand(N) * scale) - scale / 2 + 0.5
     points = list(zip(X, Y))
     output = regressor(points)
-    color = list(map(lambda x: 'r' if x >= 0.5 else 'b', output))
+    color = list(map(lambda x: 'r' if x >= threshhold else 'b', output))
     # plot
     fig, ax = plt.subplots(figsize = (10, 10))
     ax.vlines(1, 0, 1, colors = 'black', linewidth = 3)
