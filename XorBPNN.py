@@ -46,7 +46,7 @@ vSign = np.vectorize(Sign)
 implementation of XorBPNN
 '''
 class XorBPNN (BaseEstimator, ClassifierMixin):
-    def __init__(self, learning_rate = 0.1, epoch = 100, batchsize = 1, 
+    def __init__(self, learning_rate = 0.1, epoch = 1000, batchsize = 1, 
                     hidden_layer_size = 2,
                     activate = sigmoid, d_activate_to_x = d_sigmoid_to_x,
                     earlystop = True):

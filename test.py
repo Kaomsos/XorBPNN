@@ -23,7 +23,7 @@ a test fot XorBPNN
 from XorBPNN import XorBPNN
 from visualize import visualize_scatter, visualize_contour
 from numpy import exp
-fig_scale = 10
+fig_scale = 5
 
 def sigmoid(x):
     return 1 / (1 + exp(-x))
