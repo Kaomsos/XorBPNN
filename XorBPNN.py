@@ -48,7 +48,8 @@ implementation of XorBPNN
 class XorBPNN (BaseEstimator, ClassifierMixin):
     def __init__(self, learning_rate = 0.1, epoch = 100, batchsize = 1, 
                     hidden_layer_size = 2,
-                    activate = sigmoid, d_activate_to_x = d_sigmoid_to_x):
+                    activate = sigmoid, d_activate_to_x = d_sigmoid_to_x,
+                    earlystop = True):
         """
         Called when initializing the classifier
         """
@@ -74,10 +75,11 @@ class XorBPNN (BaseEstimator, ClassifierMixin):
         self.activate = activate
         self.vactivate = np.vectorize(self.activate)
         self.d_activate_to_x = d_activate_to_x
+        self.earlystop = earlystop
         # and then initialize the layers
         self.forward(np.ones(2))
-        
-        # built_in dataset
+
+        # built_in data
         self.test_X = np.array([[0, 0],
                                 [0, 1],
                                 [1, 0],
@@ -86,6 +88,7 @@ class XorBPNN (BaseEstimator, ClassifierMixin):
                                 1,
                                 1,
                                 0])
+        self.log_per_epoch = []
     # def set_params(self, **params):
     #     return super().set_params(**params)
     # def get_params(self, deep=True):
@@ -112,12 +115,14 @@ class XorBPNN (BaseEstimator, ClassifierMixin):
             for j in range(self.batchsize):
                 self.forward(batch_X[j])
                 self.backward(batch_y[j])
-            print("fiting...   epoch = {0}, loss = {1}".format(i + 1, self.loss(self.test_X, self.test_y)))
-            try:
-                assert self.score(self.test_X, self.test_y) < 1, "Perfect Prediction, Early Stop　Triggered."
-            except AssertionError as e:
-                print(e.args[0])
-                break
+            # print("fiting...   epoch = {0}, loss = {1}, accuracy = {2}".format(i + 1, self.loss(self.test_X, self.test_y), self.score(self.test_X, self.test_y)))
+            self.log_per_epoch.append({'epoch':i + 1, 'loss':self.loss(self.test_X, self.test_y), 'acc':self.score(self.test_X, self.test_y)})
+            if (self.earlystop):
+                try:
+                    assert self.score(self.test_X, self.test_y) < 1, "Perfect Prediction, Early Stop　Triggered."
+                except AssertionError as e:
+                    print(e.args[0])
+                    break
         return self
 
     def predict(self, X):

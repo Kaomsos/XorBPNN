@@ -1,4 +1,5 @@
 from matplotlib import pyplot as plt
+import matplotlib.animation as animation
 import numpy as np
 from numpy import random
 from IPython.display import display # <- where the display() is included

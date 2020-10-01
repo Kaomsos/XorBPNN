@@ -23,7 +23,8 @@ a test fot XorBPNN
 from XorBPNN import XorBPNN
 from visualize import visualize_scatter, visualize_contour
 from numpy import exp
-fig_scale = 2
+fig_scale = 10
+
 def sigmoid(x):
     return 1 / (1 + exp(-x))
 def d_sigmoid(y_hat):
@@ -50,25 +51,47 @@ nn = XorBPNN(epoch = 1000,
                 learning_rate=0.1, 
                 hidden_layer_size=2,
                 activate=tanh,
-                d_activate_to_x=d_tanh)
+                d_activate_to_x=d_tanh,
+                earlystop=True)
 # plot initial nn
 visualize_scatter(regressor=nn.predict, scale = fig_scale, threshhold=0)
 
-# %%
 print("the initial weights of BPNN is \n W_1:\n{0}\n W_2:\n{1}".format(nn.W_1, nn.W_2))
 X = nn.test_X
 y = nn.test_y
 print("predition:")
 nn.predict(X)
 
+# %%
 nn.fit(X, y)
 print("the trained weights of BPNN is \n W_1:\n{0}\n W_2:\n{1}".format(nn.W_1, nn.W_2))
 
 print("score /accuracy of the NN is: {0}".format(nn.score(X, y)))
 print("loss of the nn is:{0}".format(nn.loss(X, y)))
+print("predition:")
+print(nn.predict(X))
 # plot trained nn
-visualize_scatter(regressor=nn.predict, scale = fig_scale)
+visualize_scatter(regressor=nn.predict, scale = fig_scale, threshhold=0)
 
+########################################################################################
+# %%
+import numpy as np
+from matplotlib import pyplot as plt
+
+epoch = np.array([log['epoch'] for log in nn.log_per_epoch])
+loss = np.array([log['loss'] for log in nn.log_per_epoch])
+acc = np.array([log['acc'] for log in nn.log_per_epoch])
+fig, ax = plt.subplots(figsize = (10, 10))
+ax.set_xlabel('training epoch (batchsize = 4)')
+ax.set_ylabel('MSE')
+ax.plot(epoch, loss, label = 'training loss')
+ax2 = ax.twinx()
+ax2.plot(epoch, acc, label = 'prediction accuracy', color = 'orange')
+ax2.set_yticks(np.linspace(0.5,1,3))
+ax2.set_ylabel('Accuracy')
+# ax.legend(loc = 0)
+# ax2.legend(loc = 1)
+fig.legend(loc = 'upper right', bbox_to_anchor=(0.85, 0.85))
 # %%
 '''
 a test for AssertionError
