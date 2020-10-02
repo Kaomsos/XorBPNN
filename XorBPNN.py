@@ -37,7 +37,7 @@ def Sign(x, threshhold = 0):
     return 1 if x >= threshhold
     else return 0
     '''
-    return 1 if x >= threshhold else 0 
+    return 1 if x >= threshhold else -1 
 
 vSign = np.vectorize(Sign)
 
@@ -84,10 +84,10 @@ class XorBPNN (BaseEstimator, ClassifierMixin):
                                 [0, 1],
                                 [1, 0],
                                 [1, 1]])
-        self.test_y = np.array([0,
+        self.test_y = np.array([-1,
                                 1,
                                 1,
-                                0])
+                                -1])
         self.log_per_epoch = []
     # def set_params(self, **params):
     #     return super().set_params(**params)
